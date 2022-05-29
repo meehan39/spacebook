@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  database:
+    container_name: database
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./database:/usr/src/database
+  auth:
+    container_name: auth
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    volumes:
+      - ./auth:/usr/src/auth
+    ports:
+      - "8001:8001"
