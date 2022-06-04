@@ -1,6 +1,6 @@
 FROM node:12
-WORKDIR /usr/src/auth
+WORKDIR /usr/src/query
 COPY . .
 RUN npm install
-EXPOSE 8001
+EXPOSE 8002
 CMD ["npm", "run", "dev"]

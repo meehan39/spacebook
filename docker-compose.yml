@@ -8,8 +8,21 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${DB_PASSWORD}
+      - DATABASE_PUBLIC_URL=database
     volumes:
       - ./database:/usr/src/database
+
+  query:
+    container_name: query
+    build:
+      context: ./query
+      dockerfile: Dockerfile
+    volumes:
+      - ./query:/usr/src/query
+      - /usr/src/query/node_modules
+    ports:
+      - "8002:8002"
+
   auth:
     container_name: auth
     build:
@@ -17,5 +30,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./auth:/usr/src/auth
+      - /usr/src/auth/node_modules
     ports:
       - "8001:8001"
