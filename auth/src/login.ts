@@ -42,11 +42,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         if (user.data.exists) {
             const correctPass: boolean = await bcrypt.compare(body.data.password, user.data.password);
             if (correctPass) {
-                const token = jwt.sign({
-                    userID: user.data.userID,
-                    email: body.data.email,
-                    password: body.data.password
-                }, JWT_TOKEN_KEY);
+                const token = jwt.sign(
+                    {
+                        userID: user.data.userID,
+                        email: body.data.email
+                    },
+                    JWT_TOKEN_KEY,
+                    {expiresIn: '1d'}
+                );
                 response.message = 'Login success';
                 response.data.success = true;
                 response.data.sessionToken = token;
