@@ -1,10 +1,11 @@
 import express, { Application, Request, Response, NextFunction, Router } from 'express';
+import 'dotenv/config';
 import { RequestBody, ResponseBody } from './types'
 import { log } from './log';
 import { signup } from './signup';
 import { login } from './login';
-import 'dotenv/config';
 import { checkForUser } from './checkForUser';
+import { getUser } from './getUser';
 
 const PORT: string = process.env.PORT ?? '';
 const API_KEY: string = process.env.API_KEY ?? '';
@@ -32,6 +33,7 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/checkForUser', checkForUser);
+router.post('/getUser', getUser);
 
 app.use('/query', router)
 app.listen(PORT, () => {

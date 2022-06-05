@@ -1,13 +1,12 @@
 import { Request, Response } from "express";
 import fetch from 'node-fetch';
-import 'dotenv/config';
 import bcrypt from 'bcrypt';
+import 'dotenv/config';
 
 import { RequestBody, ResponseBody } from "./types";
 
 const API_KEY: string = process.env.API_KEY ?? '';
-
-const saltRounds: number = parseInt(process.env.SALT_ROUNDS ?? '');
+const SALT_ROUNDS: number = parseInt(process.env.SALT_ROUNDS ?? '');
 
 interface SignupRequest {
     email: string,
@@ -41,7 +40,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         if (validEmail(body.data.email)) {
             if (validPassword(body.data.password)) {
                 if (body.data.password === body.data.repeatPassword) {
-                    const salt = await bcrypt.genSalt(saltRounds);
+                    const salt = await bcrypt.genSalt(SALT_ROUNDS);
                     const hash = await bcrypt.hash(body.data.password, salt);
                     const checkResponseData = await fetch('http://query:8002/query/checkForUser', {
                         method: 'POST',

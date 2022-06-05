@@ -33,21 +33,6 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         pool.close();
         responseBody.message = 'Success';
         responseBody.data.success = true;
-//         const newUser: sql.IResult<any> = await pool.request()
-//             .input('email', sql.NVarChar, requestBody.data.email)
-//             .query(`
-//             SELECT email, password FROM Users
-//             WHERE email = @email;
-//             `);
-//         if (newUser.recordset[0] !== undefined) {
-//             responseBody.message = 'Signup success';
-//             responseBody.data.success = true;
-//             responseBody.data.email = newUser.recordset[0].email;
-//             responseBody.data.password = newUser.recordset[0].password;
-//         } else {
-//             res.status(500);
-//             responseBody.message = 'Signup error';
-//         }
     } catch(error) {
         res.status(500);
         responseBody.message = 'Internal server error';
