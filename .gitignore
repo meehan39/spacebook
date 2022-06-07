@@ -2,3 +2,25 @@
 .vscode
 */node_modules
 dbBackup.sql
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+frontend/.next/
+frontend/out/
+
+# production
+*/build
+
+# misc
+frontend.DS_Store
+*.pem
+
+# typescript
+*.tsbuildinfo
