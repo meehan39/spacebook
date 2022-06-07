@@ -33,3 +33,14 @@ services:
       - /usr/src/auth/node_modules
     ports:
       - "8001:8001"
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/usr/src/frontend
+      - /usr/src/frontend/node_modules
+    ports:
+      - "3000:3000"
