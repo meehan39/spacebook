@@ -1,21 +1,10 @@
 import { Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-
-import { RequestBody, ResponseBody } from "./types";
+import { RequestBody, ResponseBody, AuthRequest, AuthResponse } from "./types/global";
 
 const API_KEY: string = process.env.API_KEY ?? '';
 const JWT_TOKEN_KEY: string = process.env.JWT_TOKEN_KEY ?? '';
-
-interface AuthRequest {
-    token: string
-}
-
-interface AuthResponse {
-    success: boolean,
-    userID?: number,
-    email?: string
-}
 
 export const authenticate = (req: Request, res: Response): void => {
     const response: ResponseBody<AuthResponse> = {

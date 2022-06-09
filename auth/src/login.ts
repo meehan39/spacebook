@@ -1,23 +1,12 @@
 import { Request, Response } from "express";
 import bcrypt from 'bcrypt';
-import fetch from 'node-fetch';
+import axios from "axios";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-
-import { RequestBody, ResponseBody } from "./types";
+import { RequestBody, ResponseBody, LoginRequest, LoginResponse, GetUserResponse } from "./types/global";
 
 const API_KEY: string = process.env.API_KEY ?? '';
 const JWT_TOKEN_KEY: string = process.env.JWT_TOKEN_KEY ?? '';
-
-interface LoginRequest {
-    email: string,
-    password: string
-}
-
-interface LoginResponse {
-    success: boolean,
-    sessionToken?: string
-}
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     const response: ResponseBody<LoginResponse> = {
@@ -28,23 +17,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
     try {
         const body: RequestBody<LoginRequest> = req.body;
-        const userData = await fetch('http://query:8002/query/getUser', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
+        const {data} = await axios.post<ResponseBody<GetUserResponse>>
+        ('http://query:8002/query/getUser',
+            {
                 apiKey: API_KEY,
                 data: {
                     email: body.data.email
                 }
             })
-        });
-        const user: any = await userData.json();
-        if (user.data.exists) {
-            const correctPass: boolean = await bcrypt.compare(body.data.password, user.data.password);
+        if (data.data.exists) {
+            const correctPass: boolean = await bcrypt.compare(body.data.password, data.data.password!);
             if (correctPass) {
                 const token = jwt.sign(
                     {
-                        userID: user.data.userID,
+                        userID: data.data.userID,
                         email: body.data.email
                     },
                     JWT_TOKEN_KEY,

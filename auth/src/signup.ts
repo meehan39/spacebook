@@ -1,24 +1,14 @@
 import { Request, Response } from "express";
-import fetch from 'node-fetch';
+import axios from "axios";
 import bcrypt from 'bcrypt';
 import 'dotenv/config';
 
-import { RequestBody, ResponseBody } from "./types";
+import { CheckForUserResponse, RequestBody, ResponseBody, SignupAPIResponse, SignupRequest, SignupResponse } from "./types/global";
 
 const API_KEY: string = process.env.API_KEY ?? '';
 const SALT_ROUNDS: number = parseInt(process.env.SALT_ROUNDS ?? '');
 
-interface SignupRequest {
-    email: string,
-    password: string,
-    repeatPassword: string
-}
 
-interface SignupResponse {
-    success: boolean,
-    email?: string,
-    password?: string
-}
 
 const validEmail = (email: string): boolean => {
     return !!email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
@@ -42,34 +32,29 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
                 if (body.data.password === body.data.repeatPassword) {
                     const salt = await bcrypt.genSalt(SALT_ROUNDS);
                     const hash = await bcrypt.hash(body.data.password, salt);
-                    const checkResponseData = await fetch('http://query:8002/query/checkForUser', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            apiKey: API_KEY,
-                            data: {
-                                email: body.data.email
-                            }
-                        })
+                    let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
+                    ('http://query:8002/query/checkForUser', {
+                        apiKey: API_KEY,
+                        data: {
+                            email: body.data.email
+                        }
                     });
-                    const checkResponse: any = await checkResponseData.json();
+                    const checkResponse = data;
 
                     if (!checkResponse.data.exists) {
-                        const insertResponseData = await fetch('http://query:8002/query/signup', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({
-                                apiKey: API_KEY,
-                                data: {
-                                    email: body.data.email,
-                                    password: hash
-                                }
-                            })
+                        let {data} = await axios.post<ResponseBody<SignupAPIResponse>>
+                        ('http://query:8002/query/signup', {
+                            apiKey: API_KEY,
+                            data: {
+                                email: body.data.email,
+                                password: hash
+                            }
                         });
-                        const insertResponse: any = await insertResponseData.json();
-                        if (insertResponse.data.success) {
+                        const insertResponse = data;
 
-                            const doubleCheckResponseData = await fetch('http://query:8002/query/checkForUser', {
+                        if (insertResponse.data.success) {
+                            let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
+                            ('http://query:8002/query/checkForUser', {
                                 method: 'POST',
                                 headers: {'Content-Type': 'application/json'},
                                 body: JSON.stringify({
@@ -79,7 +64,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
                                     }
                                 })
                             });
-                            const doubleCheckResponse: any = await doubleCheckResponseData.json();
+                            const doubleCheckResponse = data;
                             if (!!doubleCheckResponse.data.exists) {
                                 response.message = 'Success',
                                 response.data = {

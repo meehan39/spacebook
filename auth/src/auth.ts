@@ -4,8 +4,7 @@ import { signup } from './signup';
 import { login } from './login';
 import { authenticate } from './authenticate';
 import 'dotenv/config';
-
-import { RequestBody, ResponseBody } from './types';
+import { RequestBody, ResponseBody } from "./types/global";
 
 const PORT: string = process.env.PORT ?? '';
 const API_KEY: string = process.env.API_KEY ?? '';
