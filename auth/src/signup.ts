@@ -55,14 +55,10 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
                         if (insertResponse.data.success) {
                             let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
                             ('http://query:8002/query/checkForUser', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({
-                                    apiKey: API_KEY,
-                                    data: {
-                                        email: body.data.email
-                                    }
-                                })
+                                apiKey: API_KEY,
+                                data: {
+                                    email: body.data.email
+                                }
                             });
                             const doubleCheckResponse = data;
                             if (!!doubleCheckResponse.data.exists) {
