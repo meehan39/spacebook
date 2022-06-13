@@ -1,9 +1,10 @@
 interface props {
     name: string,
+    submit: () => void,
     children: JSX.Element | JSX.Element[]
 }
 
-export default ({name, children}: props): JSX.Element => (
+export default ({name, submit, children}: props): JSX.Element => (
     <form className='
         w-full max-w-xl
         flex flex-col justify-center items-center
@@ -18,7 +19,7 @@ export default ({name, children}: props): JSX.Element => (
         >
             {children}
         </div>
-        <button type='submit'
+        <button onClick={submit} type='button'
             className='
             group
             w-48 p-2
