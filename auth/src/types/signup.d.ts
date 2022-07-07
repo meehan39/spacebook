@@ -10,7 +10,10 @@ export interface SignupResponse {
 	password?: string;
 }
 
-export interface Response {
+export interface CheckForUserResponse {
+	exists?: boolean;
+}
+
+export interface SignupAPIResponse {
 	success: boolean;
-	message?: string;
 }

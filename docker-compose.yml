@@ -1,58 +1,58 @@
 version: '3.7'
 services:
-  database:
-    container_name: database
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    ports:
-      - "1433:1433"
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${DB_PASSWORD}
-      - DATABASE_PUBLIC_URL=database
-    volumes:
-      - ./database:/usr/src/database
+    database:
+        container_name: database
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+            - '1433:1433'
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=${DB_PASSWORD}
+            - DATABASE_PUBLIC_URL=database
+        volumes:
+            - ./database:/usr/src/database
 
-  query:
-    container_name: query
-    build:
-      context: ./query
-      dockerfile: Dockerfile
-    volumes:
-      - ./query:/usr/src/query
-      - /usr/src/query/node_modules
-    ports:
-      - "8002:8002"
+    query:
+        container_name: query
+        build:
+            context: ./query
+            dockerfile: Dockerfile
+        volumes:
+            - ./query:/usr/src/query
+            - /usr/src/query/node_modules
+        ports:
+            - '8002:8002'
 
-  auth:
-    container_name: auth
-    build:
-      context: ./auth
-      dockerfile: Dockerfile
-    volumes:
-      - ./auth:/usr/src/auth
-      - /usr/src/auth/node_modules
-    ports:
-      - "8001:8001"
+    auth:
+        container_name: auth
+        build:
+            context: ./auth
+            dockerfile: Dockerfile
+        volumes:
+            - ./auth:/usr/src/auth
+            - /usr/src/auth/node_modules
+        ports:
+            - '8001:8001'
 
-  posts:
-    container_name: posts
-    build:
-      context: ./posts
-      dockerfile: Dockerfile
-    volumes:
-      - ./posts:/usr/src/posts
-      - /usr/src/posts/node_modules
-    ports:
-      - "8003:8003"
+    posts:
+        container_name: posts
+        build:
+            context: ./posts
+            dockerfile: Dockerfile
+        volumes:
+            - ./posts:/usr/src/posts
+            - /usr/src/posts/node_modules
+        ports:
+            - '8003:8003'
 
-  frontend:
-    container_name: frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/usr/src/frontend
-      - /usr/src/frontend/node_modules
-    ports:
-      - "3000:3000"
-    tty: true
+    frontend:
+        container_name: frontend
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        volumes:
+            - ./frontend:/usr/src/frontend
+            - /usr/src/frontend/node_modules
+        ports:
+            - '3000:3000'
+        tty: true

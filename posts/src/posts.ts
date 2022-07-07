@@ -1,4 +1,10 @@
-import express, { Application, Request, Response, NextFunction, Router } from 'express';
+import express, {
+	Application,
+	Request,
+	Response,
+	NextFunction,
+	Router
+} from 'express';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
@@ -16,22 +22,22 @@ app.use(express.json());
 app.use(cookieParser());
 
 router.use((req: Request, res: Response, next: NextFunction) => {
-    log(req.ip, req.method, req.path);
-    if (req.cookies.apiKey === API_KEY) {
-        next();
-    } else {
-        res.status(400);
-        const responseBody: ResponseBody<null> = {
-        message: 'Unauthorized request',
-        data: null
-        }
-        res.send(responseBody);
-    }
+	log(req.ip, req.method, req.path);
+	if (req.cookies.apiKey === API_KEY) {
+		next();
+	} else {
+		res.status(400);
+		const responseBody: ResponseBody<null> = {
+			message: 'Unauthorized request',
+			data: null
+		};
+		res.send(responseBody);
+	}
 });
 
 router.get('/getPosts', getPosts);
 
-app.use('/posts', router)
+app.use('/posts', router);
 app.listen(PORT, () => {
-  console.log("[POSTS] Server is running on port", PORT);
+	console.log('[POSTS] Server is running on port', PORT);
 });
