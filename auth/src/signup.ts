@@ -27,69 +27,75 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     }
     try {
         const body: RequestBody<SignupRequest> = req.body;
-        if (validEmail(body.data.email)) {
-            if (validPassword(body.data.password)) {
-                if (body.data.password === body.data.repeatPassword) {
-                    const salt = await bcrypt.genSalt(SALT_ROUNDS);
-                    const hash = await bcrypt.hash(body.data.password, salt);
-                    let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
-                    ('http://query:8002/query/checkForUser', {
-                        apiKey: API_KEY,
-                        data: {
-                            email: body.data.email
-                        }
-                    });
-                    const checkResponse = data;
-
-                    if (!checkResponse.data.exists) {
-                        let {data} = await axios.post<ResponseBody<SignupAPIResponse>>
-                        ('http://query:8002/query/signup', {
+        if (body.apiKey === API_KEY) {
+            if (validEmail(body.data.email)) {
+                if (validPassword(body.data.password)) {
+                    if (body.data.password === body.data.repeatPassword) {
+                        let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
+                        ('http://query:8002/query/checkForUser', {
                             apiKey: API_KEY,
                             data: {
-                                email: body.data.email,
-                                password: hash
+                                email: body.data.email
                             }
                         });
-                        const insertResponse = data;
+                        const checkResponse = data;
 
-                        if (insertResponse.data.success) {
-                            let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
-                            ('http://query:8002/query/checkForUser', {
+                        if (!checkResponse.data.exists) {
+                            const salt = await bcrypt.genSalt(SALT_ROUNDS);
+                            const hash = await bcrypt.hash(body.data.password, salt);
+                            let {data} = await axios.post<ResponseBody<SignupAPIResponse>>
+                            ('http://query:8002/query/signup', {
                                 apiKey: API_KEY,
                                 data: {
-                                    email: body.data.email
+                                    email: body.data.email,
+                                    password: hash
                                 }
                             });
-                            const doubleCheckResponse = data;
-                            if (!!doubleCheckResponse.data.exists) {
-                                response.message = 'Success',
-                                response.data = {
-                                    success: true
+                            const insertResponse = data;
+
+                            if (insertResponse.data.success) {
+                                let {data} = await axios.post<ResponseBody<CheckForUserResponse>>
+                                ('http://query:8002/query/checkForUser', {
+                                    apiKey: API_KEY,
+                                    data: {
+                                        email: body.data.email
+                                    }
+                                });
+                                const doubleCheckResponse = data;
+                                if (!!doubleCheckResponse.data.exists) {
+                                    response.message = 'Success',
+                                    response.data = {
+                                        success: true
+                                    }
+                                } else {
+                                    res.status(500);
+                                    response.message = 'Internal server error',
+                                    response.data = {
+                                        success: false
+                                    }
                                 }
-                            } else {
-                                res.status(500);
-                                response.message = '[Double Check] Internal server error',
-                                response.data = {
-                                    success: false
-                                }
+                            }
+                        } else {
+                            response.message = 'Email already exists',
+                            response.data = {
+                                success: false
                             }
                         }
                     } else {
-                        response.message = 'Email already exists',
-                        response.data = {
-                            success: false
-                        }
+                        response.message = "Passwords don't match";
+                        response.data.success = false;
                     }
                 } else {
-                    response.message = "Passwords don't match";
+                    response.message = 'Invalid password';
                     response.data.success = false;
                 }
             } else {
-                response.message = 'Invalid password';
+                response.message = 'Invalid email';
                 response.data.success = false;
             }
         } else {
-            response.message = 'Invalid email';
+            res.status(401);
+            response.message = 'Unauthorized request';
             response.data.success = false;
         }
 

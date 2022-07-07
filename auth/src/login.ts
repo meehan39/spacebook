@@ -17,34 +17,40 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
     try {
         const body: RequestBody<LoginRequest> = req.body;
-        const {data} = await axios.post<ResponseBody<GetUserResponse>>
-        ('http://query:8002/query/getUser',
-            {
-                apiKey: API_KEY,
-                data: {
-                    email: body.data.email
-                }
-            })
-        if (data.data.exists) {
-            const correctPass: boolean = await bcrypt.compare(body.data.password, data.data.password!);
-            if (correctPass) {
-                const token = jwt.sign(
-                    {
-                        userID: data.data.userID,
+        if (body.apiKey === API_KEY) {
+            const {data} = await axios.post<ResponseBody<GetUserResponse>>
+            ('http://query:8002/query/getUser',
+                {
+                    apiKey: API_KEY,
+                    data: {
                         email: body.data.email
-                    },
-                    JWT_TOKEN_KEY,
-                    {expiresIn: '1d'}
-                );
-                response.message = 'Login success';
-                response.data.success = true;
-                response.data.sessionToken = token;
+                    }
+                })
+            if (data.data.exists) {
+                const correctPass: boolean = await bcrypt.compare(body.data.password, data.data.password!);
+                if (correctPass) {
+                    const token = jwt.sign(
+                        {
+                            userID: data.data.userID,
+                            email: body.data.email
+                        },
+                        JWT_TOKEN_KEY,
+                        {expiresIn: '1d'}
+                    );
+                    response.message = 'Login success';
+                    response.data.success = true;
+                    response.data.sessionToken = token;
+                } else {
+                    response.message = 'Invalid login';
+                    response.data.success = false;
+                }
             } else {
                 response.message = 'Invalid login';
                 response.data.success = false;
             }
         } else {
-            response.message = 'Invalid login';
+            res.status(401);
+            response.message = 'Unauthorized request';
             response.data.success = false;
         }
     } catch (error) {

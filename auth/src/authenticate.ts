@@ -14,15 +14,21 @@ export const authenticate = (req: Request, res: Response): void => {
         }
     }
     try {
-        const body: RequestBody<AuthRequest> = req.body;
-        try {
-            const user: any = jwt.verify(body.data.token, JWT_TOKEN_KEY);
-            response.message = 'Successfully authenticated';
-            response.data.success = true;
-            response.data.userID = user.userID;
-            response.data.email = user.email;
-        } catch (tokenExpired) {
-            response.message = 'Token expired';
+        const body: RequestBody<any> = req.body;
+        if (body.apiKey === API_KEY) {
+            try {
+                const user: any = jwt.verify(body.data.token, JWT_TOKEN_KEY);
+                response.message = 'Successfully authenticated';
+                response.data.success = true;
+                response.data.userID = user.userID;
+                response.data.email = user.email;
+            } catch (tokenExpired) {
+                response.message = 'Token expired';
+                response.data.success = false;
+            }
+        } else {
+            res.status(401);
+            response.message = 'Unauthorized request';
             response.data.success = false;
         }
     } catch(error) {

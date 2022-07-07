@@ -40,8 +40,6 @@ export interface AuthResponse {
     email?: string
 }
 
-
-
 export interface GetUserResponse {
     exists: boolean,
     userID?: number,
