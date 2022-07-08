@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
+import request from '../util/request';
+import { getJwtKey } from '../util/env';
 import { PostRequest, PostResponse } from '../types/login';
 import { GetUserRequest, GetUserResponse } from '../types/global';
-import { getApiKey, getJwtKey } from '../util/env';
 
-const API_KEY: string = getApiKey();
 const JWT_KEY: string = getJwtKey();
 
 const login = async (req: Request, res: Response): Promise<void> => {
@@ -21,24 +20,20 @@ const login = async (req: Request, res: Response): Promise<void> => {
 			type: 'email',
 			key: body.email
 		};
-		const { data } = await axios.get<GetUserResponse>(
+		const getUserResponse: GetUserResponse = await request(
+			'GET',
 			'http://query:8002/query/user',
-			{
-				headers: {
-					'api-key': API_KEY
-				},
-				params: getUserRequest
-			}
+			getUserRequest
 		);
-		if (data.userID) {
+		if (getUserResponse.userID) {
 			const correctPass: boolean = await bcrypt.compare(
 				body.password,
-				data.password!
+				getUserResponse.password!
 			);
 			if (correctPass) {
 				const token = jwt.sign(
 					{
-						userID: data.userID,
+						userID: getUserResponse.userID,
 						email: body.email
 					},
 					JWT_KEY,

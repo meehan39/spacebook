@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import axios from 'axios';
 import bcrypt from 'bcrypt';
 import 'dotenv/config';
 
-import { getApiKey } from '../util/env';
+import request from '../util/request';
+import { getSaltRounds } from '../util/env';
 import {
 	GetUserRequest,
 	GetUserResponse,
@@ -12,8 +12,7 @@ import {
 } from '../types/global';
 import { PostRequest, PostResponse } from '../types/signup';
 
-const API_KEY: string = getApiKey();
-const SALT_ROUNDS: number = parseInt(process.env.SALT_ROUNDS ?? '10');
+const SALT_ROUNDS: number = getSaltRounds();
 
 const validEmail = (email: string): boolean => {
 	return !!email.match(
@@ -41,46 +40,33 @@ const signup = async (req: Request, res: Response): Promise<void> => {
 					key: body.email
 				};
 				if (body.password === body.repeatPassword) {
-					let { data } = await axios.get<GetUserResponse>(
+					const getUserResponse: GetUserResponse = await request(
+						'GET',
 						'http://query:8002/query/user',
-						{
-							headers: {
-								'api-key': API_KEY
-							},
-							params: getUserRequest
-						}
+						getUserRequest
 					);
-					const checkResponse: GetUserResponse = data;
 
-					if (!checkResponse.userID) {
+					if (!getUserResponse.userID) {
 						const salt = await bcrypt.genSalt(SALT_ROUNDS);
 						const hash = await bcrypt.hash(body.password, salt);
 						const postUserRequest: PostUserRequest = {
 							email: body.email,
 							password: hash
 						};
-						let { data } = await axios.post<PostUserResponse>(
-							'http://query:8002/query/user',
-							postUserRequest,
-							{
-								headers: {
-									'api-key': API_KEY
-								}
-							}
-						);
-						const postUserResponse: PostUserResponse = data;
+						const postUserResponse: PostUserResponse =
+							await request(
+								'POST',
+								'http://query:8002/query/user',
+								postUserRequest
+							);
 
 						if (postUserResponse.success) {
-							let { data } = await axios.get<GetUserResponse>(
-								'http://query:8002/query/user',
-								{
-									headers: {
-										'api-key': API_KEY
-									},
-									params: getUserRequest
-								}
-							);
-							const checkGetUserResponse: GetUserResponse = data;
+							const checkGetUserResponse: GetUserResponse =
+								await request(
+									'GET',
+									'http://query:8002/query/user',
+									getUserRequest
+								);
 							if (!!checkGetUserResponse.userID) {
 								response.message = 'Success';
 								response.success = true;

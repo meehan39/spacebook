@@ -25,4 +25,8 @@ const getJwtKey = (): string => {
 	return jwtKey;
 };
 
-export { getApiKey, getPort, getJwtKey };
+const getSaltRounds = (): number => {
+	return parseInt(process.env.SALT_ROUNDS ?? '10');
+};
+
+export { getApiKey, getPort, getJwtKey, getSaltRounds };
