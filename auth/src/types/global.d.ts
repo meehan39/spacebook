@@ -1,9 +1,23 @@
-export interface RequestBody<T> {
-	apiKey: string;
-	data: T;
+interface GetUserRequest {
+	type: string;
+	key: string;
 }
 
-export interface ResponseBody<T> {
+interface GetUserResponse {
 	message: string;
-	data: T;
+	userID?: number;
+	email?: string;
+	password?: string;
 }
+
+interface PostUserRequest {
+	email: string;
+	password: string;
+}
+
+interface PostUserResponse {
+	message: string;
+	success: boolean;
+}
+
+export { GetUserRequest, GetUserResponse, PostUserRequest, PostUserResponse };

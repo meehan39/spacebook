@@ -15,7 +15,7 @@ interface DBConfig {
 	};
 }
 
-export const readConfig: DBConfig = {
+const readConfig: DBConfig = {
 	user: process.env.DB_USER_READ ?? '',
 	password: process.env.DB_PASSWORD_READ ?? '',
 	database: process.env.DB_NAME ?? '',
@@ -31,7 +31,7 @@ export const readConfig: DBConfig = {
 	}
 };
 
-export const readWriteConfig: DBConfig = {
+const readWriteConfig: DBConfig = {
 	user: process.env.DB_USER_READ_WRITE ?? '',
 	password: process.env.DB_PASSWORD_READ_WRITE ?? '',
 	database: process.env.DB_NAME ?? '',
@@ -46,3 +46,5 @@ export const readWriteConfig: DBConfig = {
 			process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
 	}
 };
+
+export { readConfig, readWriteConfig };

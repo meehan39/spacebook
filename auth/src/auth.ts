@@ -7,15 +7,14 @@ import express, {
 } from 'express';
 import 'dotenv/config';
 
-import { log } from './log';
-import { signup } from './signup';
-import { login } from './login';
-import { authenticate } from './authenticate';
+import { log } from './util/log';
+import { getApiKey, getPort } from './util/env';
+import signup from './routes/signup';
+import login from './routes/login';
+import authenticate from './routes/authenticate';
 
-import { RequestBody, ResponseBody } from './types/global';
-
-const PORT: string = process.env.PORT ?? '';
-const API_KEY: string = process.env.API_KEY ?? '';
+const PORT: number = getPort();
+const API_KEY: string = getApiKey();
 
 const app: Application = express();
 const router: Router = Router();
@@ -24,16 +23,11 @@ app.use(express.json());
 
 router.use((req: Request, res: Response, next: NextFunction) => {
 	log(req.ip, req.method, req.path);
-	const requestBody: RequestBody<any> = req.body;
-	if (requestBody.apiKey === API_KEY) {
+	if (req.get('api-key') === API_KEY) {
 		next();
 	} else {
-		res.status(400);
-		const responseBody: ResponseBody<null> = {
-			message: 'Unauthorized request',
-			data: null
-		};
-		res.send(responseBody);
+		res.status(401);
+		res.send({});
 	}
 });
 

@@ -1,16 +1,12 @@
-export interface LoginRequest {
+interface PostRequest {
 	email: string;
 	password: string;
 }
 
-export interface LoginResponse {
+interface PostResponse {
+	message: string;
 	success: boolean;
 	sessionToken?: string;
 }
 
-export interface GetUserResponse {
-	exists: boolean;
-	userID?: number;
-	email?: string;
-	password?: string;
-}
+export { PostRequest, PostResponse };
