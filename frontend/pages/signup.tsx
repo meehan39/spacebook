@@ -1,11 +1,10 @@
-import { NextApiResponse, NextPage } from 'next';
+import { NextPage } from 'next';
 import AuthForm from '../components/AuthForm';
 import TextInput from '../components/TextInput';
-import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { Response } from './api/types/signup';
+import { SignupRequest, SignupResponse } from './api/types/signup';
 
 const Signup: NextPage = () => {
 	const router = useRouter();
@@ -15,15 +14,20 @@ const Signup: NextPage = () => {
 	const [repeatPassword, setRepeatPassword] = useState('');
 
 	const submit = async () => {
-		const { data } = await axios.post<Response>('/api/signup', {
+		const signupRequest: SignupRequest = {
 			email: email,
 			password: password,
 			repeatPassword: repeatPassword
+		};
+		const data = await fetch('/api/signup', {
+			method: 'POST',
+			body: JSON.stringify(signupRequest)
 		});
-		if (data.success) {
+		const signupResponse: SignupResponse = await data.json();
+		if (signupResponse.success) {
 			router.push('/login');
 		} else {
-			console.error(data.message);
+			console.error(signupResponse.message);
 		}
 	};
 

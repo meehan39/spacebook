@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import sql from 'mssql';
-import 'dotenv/config';
 
 import { readConfig, readWriteConfig } from '../util/dbConfig';
 import {
@@ -25,13 +24,11 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
 				SELECT user_id, email, password FROM Users
 				WHERE ${requestBody.type} = @key;
 			`;
-			console.log(requestBody.key);
 			const user: sql.IResult<any> = await pool
 				.request()
 				.input('key', sql.NVarChar, requestBody.key)
 				.query(query);
 			pool.close();
-			console.log(user.recordset);
 			if (user.recordset[0]) {
 				responseBody.message = 'User exists';
 				responseBody.userID = user.recordset[0].user_id;

@@ -1,13 +1,12 @@
-import axios from 'axios';
 import type { NextPage } from 'next';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
 
 import AuthForm from '../components/AuthForm';
 import TextInput from '../components/TextInput';
 
-import { LoginResponse } from './api/types/login';
+import setToken from './api/util/setToken';
+import { LoginRequest, LoginResponse } from './api/types/login';
 
 const Login: NextPage = () => {
 	const router = useRouter();
@@ -16,12 +15,17 @@ const Login: NextPage = () => {
 	const [password, setPassword] = useState('');
 
 	const submit = async () => {
-		const { data } = await axios.post<LoginResponse>('/api/login', {
+		const loginRequest: LoginRequest = {
 			email: email,
 			password: password
+		};
+		const data: Response = await fetch('/api/login', {
+			method: 'POST',
+			body: JSON.stringify(loginRequest)
 		});
-		if (data.success) {
-			setCookie(null, 'token', data.sessionToken ?? '');
+		const loginResponse: LoginResponse = await data.json();
+		if (loginResponse.success) {
+			setToken(loginResponse.sessionToken);
 			router.push('/');
 		} else {
 			console.error('Login failed.');

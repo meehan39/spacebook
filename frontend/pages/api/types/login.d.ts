@@ -1,9 +1,12 @@
-export interface LoginRequest {
+interface LoginRequest {
 	email: string;
 	password: string;
 }
 
-export interface LoginResponse {
+interface LoginResponse {
+	message: string;
 	success: boolean;
 	sessionToken?: string;
 }
+
+export { LoginRequest, LoginResponse };

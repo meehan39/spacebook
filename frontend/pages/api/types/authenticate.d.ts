@@ -1,9 +1,12 @@
-export interface AuthRequest {
+interface AuthRequest {
 	token: string;
 }
 
-export interface AuthResponse {
+interface AuthResponse {
+	message: string;
 	success: boolean;
 	userID?: number;
 	email?: string;
 }
+
+export { AuthRequest, AuthResponse };
